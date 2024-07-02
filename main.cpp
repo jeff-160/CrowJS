@@ -40,5 +40,5 @@ int main(int argc, char* argv[]){
     Transpiler.CurrentFile = path.substr(path.find_last_of("/\\")+1);
     tie(Transpiler.Code, Transpiler.Lines) = ReadFile(path);
 
-    cout << Transpiler.Transpile();
+    WriteFile(Transpiler.CurrentFile, Transpiler.Transpile());
 }
