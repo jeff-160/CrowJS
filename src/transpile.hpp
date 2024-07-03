@@ -1,9 +1,23 @@
 #pragma once
 #define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
 
-static inline bool CheckBefore(const string& s, const string& f, size_t p, size_t c){
+static inline constexpr bool CheckBefore(const string& s, const string& f, size_t p, size_t c){
     size_t i = s.find(f, p);
     return (i!=string::npos && i<c);
+}
+
+static constexpr bool IsEscape(const string& s, size_t p){
+    int t = 0;
+
+    while (p>=0){
+        if (s[p]=='\\')
+            t++;
+        else
+            break;
+        p--;
+    }
+
+    return t%2;
 }
 
 static pair<bool, string> ReplaceInstances(string line, const string& macro, const string& value, bool exclude){
@@ -21,7 +35,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
                 Transpiler.LastQuote = line[pos];
 
                 size_t nextquote = line.find(Transpiler.LastQuote, pos+1);
-                if (nextquote==string::npos)
+                if (nextquote==string::npos || IsEscape(line, nextquote-1))
                     break;
                 
                 pos = nextquote+1;

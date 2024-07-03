@@ -40,8 +40,8 @@ int main(int argc, char* argv[]){
     auto start = high_resolution_clock::now();
     
     tie(Transpiler.Code, Transpiler.Lines) = ReadFile(path);
-    // WriteFile(Transpiler.CurrentFile, Transpiler.Transpile());
-    cout << Transpiler.Transpile() << endl;
+    WriteFile(Transpiler.CurrentFile, Transpiler.Transpile());
+    // cout << Transpiler.Transpile() << endl;
 
     cout << "Transpiled to "+Transpiler.CurrentFile << endl 
         << "Process exited after " << (float)(duration_cast<microseconds>(high_resolution_clock::now()-start).count())/1e6 << " seconds";

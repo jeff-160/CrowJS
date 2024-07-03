@@ -22,9 +22,9 @@ namespace Syntax{
     };
 
     struct {
-        string Keyword = "#define";
+        const string Keyword = "#define";
 
-        void Callback(const vector<string>& args){
+        constexpr void Callback(const vector<string>& args) {
             if (args.size()<2) 
                 Error("No macro name given in "+args[0]+" directive");
             if (!CheckName(args[1])) 

@@ -4,13 +4,12 @@ inline string Replace(const string& s, const string& c, const string& d){
     return regex_replace(s, regex(c), d);
 }
 
-inline void Error(const string& message, bool debug=true){
+constexpr void Error(const string& message, bool debug=true){
     if (debug)
         cout << Transpiler.CurrentFile+":"+to_string(Transpiler.CurrentLine)+": "+message+"\n\t"+Transpiler.CurrentCode;
 
-    else{
+    else
         system(string("powershell -command Write-Host "+Replace(message, "#", "`#")+" -ForegroundColor 'red'").c_str());
-    }
     exit(0);
 }
 
@@ -19,7 +18,7 @@ inline string Trim(string s){
     return s;
 }
 
-inline vector<string> Split(const string& s, char d){
+vector<string> Split(const string& s, char d){
     stringstream ss(s);
     vector<string> v;
     string t;
