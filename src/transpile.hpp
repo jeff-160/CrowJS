@@ -1,6 +1,11 @@
 #pragma once
 #define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
 
+static inline bool CheckBefore(string s, string f, size_t p, size_t c){
+    size_t i = s.find(f, p);
+    return (i!=string::npos && i<c);
+}
+
 static pair<bool, string> ReplaceInstances(string line, string macro, string value, bool exclude){
     bool c = false;
 
@@ -31,10 +36,12 @@ static pair<bool, string> ReplaceInstances(string line, string macro, string val
         if (!Transpiler.InString){
             size_t nextmacro = line.find(macro, pos);
             for (char c : q){
-                size_t p = line.find(c, pos);
-                if (p!=string::npos && p<nextmacro)
-                    goto end;
+                if (CheckBefore(line, string(1, c), pos, nextmacro))
+                    goto inc;
             }
+
+            if (CheckBefore(line, "//", pos, nextmacro))
+                goto end;
 
             if (nextmacro!=string::npos){
                 if (exclude)
@@ -45,15 +52,16 @@ static pair<bool, string> ReplaceInstances(string line, string macro, string val
             }
         }
 
-        end:
-        pos++;
+        inc:
+            pos++;
     }
 
     if (Transpiler.LastQuote!='`'){
         RESET;
     }
 
-    return {c, line};
+    end:
+        return {c, line};
 }
 
 string JSTranspiler::ReplaceMacro(string s){
@@ -99,10 +107,9 @@ string JSTranspiler::Transpile(){
                 preend ? result.push_back(line) : Error("#define should be used to declare a macro");
         }
         else{
-            bool comment = !tline.rfind("//", 0);
-            if (!comment && line.size())
+            if (line.size())
                 preend = true;
-            result.push_back(comment ? line : this->ReplaceMacro(line));
+            result.push_back(this->ReplaceMacro(line));
         }
     }
 
