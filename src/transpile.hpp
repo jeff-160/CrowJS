@@ -1,41 +1,54 @@
 #pragma once
 
+#define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
+
 static string ReplaceInstances(string line, string macro, string value){
-    char cquote;
-    regex quotes = regex("['\"`]");
+    regex quotes("[`'\"]");
 
-    for (size_t pos=0;pos<line.size();){
-        size_t nextquote = string::npos;
-        for (size_t i=pos;i<line.size();i++){
-            if (regex_match(string(1, line[i]), quotes)){
-                nextquote = i;
-                cquote = line[i];
+    size_t pos = 0;
 
-                if (cquote=='`')
-                    Transpiler.InString = true;
-                break;
+    while (pos<line.size()){
+        if (regex_match(string(1, line[pos]), quotes) && (Transpiler.LastQuote==NULL || Transpiler.LastQuote==line[pos])){
+            Transpiler.InString = !Transpiler.InString;
+
+            if (Transpiler.InString){
+                Transpiler.LastQuote = line[pos];
+
+                size_t nextquote = line.find(Transpiler.LastQuote, pos+1);
+                if (nextquote==string::npos)
+                    break;
+                
+                pos = nextquote+1;
+                RESET;
+                continue;
+            }
+            else{
+                RESET;
             }
         }
 
-        size_t nextmacro = line.find(macro, pos);
-        if (nextmacro==string::npos)
-            break;
+        if (!Transpiler.InString){
+            size_t nextmacro = line.find(macro, pos);
+            for (char c : "\"'`"){
+                size_t p = line.find(c, pos);
+                if (p!=string::npos && p<nextmacro)
+                    goto end;
+            }
 
-        if (nextquote!=string::npos && nextquote<nextmacro){
-            nextquote = line.find(cquote, nextquote+1);
-            
-            if (nextquote==string::npos)
-                break;
-            pos = nextquote+1;
-            Transpiler.InString = false;
-            continue;
+            if (nextmacro!=string::npos){
+                line.replace(nextmacro, macro.size(), value);
+                pos=nextmacro+value.size();
+            }
         }
 
-        if (!Transpiler.InString)
-            line.replace(nextmacro, macro.size(), value);
-            pos+=value.size()+1;
+        end:
+        pos++;
     }
 
+    if (Transpiler.LastQuote!='`'){
+        RESET;
+    }
+    
     return line;
 }
 

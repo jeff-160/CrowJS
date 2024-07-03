@@ -5,7 +5,8 @@ struct JSTranspiler{
     vector<string> Lines;
     int CurrentLine = 0;
 
-    bool InString = false;
+    char LastQuote = NULL;
+    bool InString = false, InInterpolate = false;
 
     string Transpile();
     string ReplaceMacro(string s);
