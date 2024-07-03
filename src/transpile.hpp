@@ -1,12 +1,13 @@
 #pragma once
-
 #define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
 
-static string ReplaceInstances(string line, string macro, string value){
-    regex quotes("[`'\"]");
+static pair<bool, string> ReplaceInstances(string line, string macro, string value, bool exclude){
+    bool c = false;
+
+    string q = "`'\"";
+    regex quotes("["+q+"]");
 
     size_t pos = 0;
-
     while (pos<line.size()){
         if (regex_match(string(1, line[pos]), quotes) && (Transpiler.LastQuote==NULL || Transpiler.LastQuote==line[pos])){
             Transpiler.InString = !Transpiler.InString;
@@ -29,13 +30,16 @@ static string ReplaceInstances(string line, string macro, string value){
 
         if (!Transpiler.InString){
             size_t nextmacro = line.find(macro, pos);
-            for (char c : "\"'`"){
+            for (char c : q){
                 size_t p = line.find(c, pos);
                 if (p!=string::npos && p<nextmacro)
                     goto end;
             }
 
             if (nextmacro!=string::npos){
+                if (exclude)
+                    Error("Recursive macro is not allowed");
+                c = true;
                 line.replace(nextmacro, macro.size(), value);
                 pos=nextmacro+value.size();
             }
@@ -48,13 +52,23 @@ static string ReplaceInstances(string line, string macro, string value){
     if (Transpiler.LastQuote!='`'){
         RESET;
     }
-    
-    return line;
+
+    return {c, line};
 }
 
 string JSTranspiler::ReplaceMacro(string s){
-    for (auto [name, value] : Syntax::Definitions){
-        s = ReplaceInstances(s, name, value);
+    bool b = true;
+    unordered_map<string, bool> m;
+
+    while (b){
+        b = false;
+        for (auto [name, value] : Syntax::Definitions){
+            bool c;
+            tie(c, s) = ReplaceInstances(s, name, value, m[name]);
+
+            if (c) 
+                m[name] = b = true;
+        }
     }
     return s;
 }
