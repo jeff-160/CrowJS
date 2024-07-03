@@ -86,7 +86,7 @@ string JSTranspiler::Transpile(){
 
         string tline = Trim(line);
 
-        if (tline.rfind("#", 0)==0){
+        if (!tline.rfind("#", 0)){
             vector<string> args = Split(tline, ' ');
             
             if (args[0]==Syntax::Define.Keyword){
@@ -99,9 +99,10 @@ string JSTranspiler::Transpile(){
                 preend ? result.push_back(line) : Error("#define should be used to declare a macro");
         }
         else{
-            if (line.size())
+            bool comment = !tline.rfind("//", 0);
+            if (!comment && line.size())
                 preend = true;
-            result.push_back(this->ReplaceMacro(line));
+            result.push_back(comment ? line : this->ReplaceMacro(line));
         }
     }
 
