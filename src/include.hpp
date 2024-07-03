@@ -1,5 +1,4 @@
 #pragma once
-using namespace std;
 
 #include <string>
 #include <regex>
@@ -12,6 +11,10 @@ using namespace std;
 #include <numeric>
 #include <algorithm>
 #include <cstdlib>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
 
 #include "transpiler.hpp"
 #include "utils.hpp"

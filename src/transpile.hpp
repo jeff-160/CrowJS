@@ -62,13 +62,16 @@ string JSTranspiler::ReplaceMacro(string s){
 
     while (b){
         b = false;
+        tuple<bool, char> save = make_tuple(Transpiler.InString, Transpiler.LastQuote);
+
         for (auto [name, value] : Syntax::Definitions){
             bool c;
             tie(c, s) = ReplaceInstances(s, name, value, m[name]);
 
-            if (c) 
+            if (c)
                 m[name] = b = true;
         }
+        tie(Transpiler.InString, Transpiler.LastQuote) = save;
     }
     return s;
 }
