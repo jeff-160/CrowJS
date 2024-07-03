@@ -1,6 +1,6 @@
 #pragma once
 
-static bool CheckName(string name){
+static bool CheckName(const string& name){
     if (!regex_match(string(1, name[0]), regex("[_a-z]", regex_constants::icase)))
         return false;
 
@@ -24,7 +24,7 @@ namespace Syntax{
     struct {
         string Keyword = "#define";
 
-        void Callback(vector<string> args){
+        void Callback(const vector<string>& args){
             if (args.size()<2) 
                 Error("No macro name given in "+args[0]+" directive");
             if (!CheckName(args[1])) 

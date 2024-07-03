@@ -1,12 +1,12 @@
 #pragma once
 #define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
 
-static inline bool CheckBefore(string s, string f, size_t p, size_t c){
+static inline bool CheckBefore(const string& s, const string& f, size_t p, size_t c){
     size_t i = s.find(f, p);
     return (i!=string::npos && i<c);
 }
 
-static pair<bool, string> ReplaceInstances(string line, string macro, string value, bool exclude){
+static pair<bool, string> ReplaceInstances(string line, const string& macro, const string& value, bool exclude){
     bool c = false;
 
     string q = "`'\"";

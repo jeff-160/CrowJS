@@ -1,7 +1,6 @@
 #include "src/include.hpp"
 
-
-static pair<string, vector<string>> ReadFile(string path){
+static pair<string, vector<string>> ReadFile(const string& path){
     ifstream file(path);
 
     auto rev = [](string s) -> string {
@@ -25,7 +24,7 @@ static pair<string, vector<string>> ReadFile(string path){
     return {contents, lines};
 }
 
-static void WriteFile(string path, string contents){
+static void WriteFile(const string& path, const string& contents){
     ofstream file(path);
     file << contents;
     file.close();
@@ -42,8 +41,8 @@ int main(int argc, char* argv[]){
     
     tie(Transpiler.Code, Transpiler.Lines) = ReadFile(path);
     // WriteFile(Transpiler.CurrentFile, Transpiler.Transpile());
-    cout << Transpiler.Transpile();
+    cout << Transpiler.Transpile() << endl;
 
-    // cout << "Transpiled to "+Transpiler.CurrentFile << endl 
-    //     << "Process exited after " << (float)(duration_cast<microseconds>(high_resolution_clock::now()-start).count())/1e6 << " seconds";
+    cout << "Transpiled to "+Transpiler.CurrentFile << endl 
+        << "Process exited after " << (float)(duration_cast<microseconds>(high_resolution_clock::now()-start).count())/1e6 << " seconds";
 }

@@ -1,16 +1,15 @@
 #pragma once
 
-inline string Replace(string s, string c, string d){
+inline string Replace(const string& s, const string& c, const string& d){
     return regex_replace(s, regex(c), d);
 }
 
-inline void Error(string message, bool debug=true){
+inline void Error(const string& message, bool debug=true){
     if (debug)
         cout << Transpiler.CurrentFile+":"+to_string(Transpiler.CurrentLine)+": "+message+"\n\t"+Transpiler.CurrentCode;
 
     else{
-        message = Replace(message, "#", "`#");
-        system(string("powershell -command Write-Host "+message+" -ForegroundColor 'red'").c_str());
+        system(string("powershell -command Write-Host "+Replace(message, "#", "`#")+" -ForegroundColor 'red'").c_str());
     }
     exit(0);
 }
@@ -20,7 +19,7 @@ inline string Trim(string s){
     return s;
 }
 
-inline vector<string> Split(string s, char d){
+inline vector<string> Split(const string& s, char d){
     stringstream ss(s);
     vector<string> v;
     string t;
@@ -32,7 +31,7 @@ inline vector<string> Split(string s, char d){
     return v;
 }
 
-vector<string> GetArgs(string s, size_t t){
+vector<string> GetArgs(const string& s, size_t t){
     vector<string> v;
     string b;
 
