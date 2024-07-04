@@ -33,7 +33,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
                 Transpiler.InComment = !i;
         }
 
-        if (regex_match(string(1, line[pos]), quotes) && (Transpiler.LastQuote==NULL || Transpiler.LastQuote==line[pos])){
+        if (!Transpiler.InComment && regex_match(string(1, line[pos]), quotes) && (Transpiler.LastQuote==NULL || Transpiler.LastQuote==line[pos])){
             Transpiler.InString = !Transpiler.InString;
 
             if (Transpiler.InString){
@@ -131,7 +131,7 @@ string JSTranspiler::Transpile(){
                 Syntax::Define.Callback(GetArgs(tline, 2));
             }
             else
-                preend ? result.push_back(line) : Error("#define should be used to declare a macro");
+                preend || (args[0]=="#!" && Transpiler.CurrentLine==1) ? result.push_back(line) : Error("#define should be used to declare a macro");
         }
         else{
             if (line.size())

@@ -31,20 +31,21 @@ vector<string> Split(const string& s, char d){
 }
 
 vector<string> GetArgs(const string& s, size_t t){
+    #define ADD string tb = Trim(b); if (tb.size()) { v.push_back(tb); t--; }
+
     vector<string> v;
     string b;
 
     for (char c : s){
         if (c==' ' && t){
-            v.push_back(Trim(b));
-            t--;
+            ADD;
             b = "";
             continue;
         }
         b+=c;
     }
-    if (b.size())
-        v.push_back(b);
-
+    ADD;
+    
+    #undef ADD
     return v;
 }
