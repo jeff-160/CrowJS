@@ -4,7 +4,7 @@ inline string Replace(const string& s, const string& c, const string& d){
     return regex_replace(s, regex(c), d);
 }
 
-constexpr void Error(const string& message, bool debug=true){
+void Error(const string& message, bool debug=true){
     if (debug)
         cout << Transpiler.CurrentFile+":"+to_string(Transpiler.CurrentLine)+": "+message+"\n\t"+Transpiler.CurrentCode;
 

@@ -14,17 +14,19 @@ static bool CheckName(const string& name){
 }
 
 namespace Syntax{
+    const string Quotes = "`'\"";
+
     unordered_map<string, string> Definitions{
-        {"__DATE__", "new Date().toString().match(/\\w+ \\d+ \\d+/)[0]"},
-        {"__TIME__", "new Date().toString().match(/\\d+:\\d+:\\d+/)[0]"},
-        {"__FILE__", "new Error().stack.match(/\\/([\\w.]+):\\d+/)[1]"},
-        {"__LINE__", "new Error().stack.match(/:(\\d+):/)[1]"},
+        // {"__DATE__", "new Date().toString().match(/\\w+ \\d+ \\d+/)[0]"},
+        // {"__TIME__", "new Date().toString().match(/\\d+:\\d+:\\d+/)[0]"},
+        // {"__FILE__", "new Error().stack.match(/\\/([\\w.]+):\\d+/)[1]"},
+        // {"__LINE__", "new Error().stack.match(/:(\\d+):/)[1]"},
     };
 
     struct {
         const string Keyword = "#define";
 
-        constexpr void Callback(const vector<string>& args) {
+        void Callback(const vector<string>& args) {
             if (args.size()<2) 
                 Error("No macro name given in "+args[0]+" directive");
             if (!CheckName(args[1])) 

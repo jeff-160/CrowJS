@@ -1,12 +1,12 @@
 #pragma once
 #define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
 
-static inline constexpr bool CheckBefore(const string& s, const string& f, size_t p, size_t c){
+static inline bool CheckBefore(const string& s, const string& f, size_t p, size_t c){
     size_t i = s.find(f, p);
     return (i!=string::npos && i<c);
 }
 
-static constexpr bool IsEscape(const string& s, size_t p){
+static constexpr bool IsEscape(const string& s, int p){
     int t = 0;
 
     while (p>=0){
@@ -22,9 +22,7 @@ static constexpr bool IsEscape(const string& s, size_t p){
 
 static pair<bool, string> ReplaceInstances(string line, const string& macro, const string& value, bool exclude){
     bool c = false;
-
-    string q = "`'\"";
-    regex quotes("["+q+"]");
+    regex quotes("["+Syntax::Quotes+"]");
 
     size_t pos = 0;
     while (pos<line.size()){
@@ -49,7 +47,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
         if (!Transpiler.InString){
             size_t nextmacro = line.find(macro, pos);
-            for (char c : q){
+            for (char c : Syntax::Quotes){
                 if (CheckBefore(line, string(1, c), pos, nextmacro))
                     goto inc;
             }
@@ -81,19 +79,26 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 string JSTranspiler::ReplaceMacro(string s){
     bool b = true;
     unordered_map<string, bool> m;
+    tuple<bool, char> save = {false, NULL};
 
     while (b){
+        size_t i = 0;
         b = false;
-        tuple<bool, char> save = make_tuple(Transpiler.InString, Transpiler.LastQuote);
 
         for (auto [name, value] : Syntax::Definitions){
+            if (get<1>(save)!=NULL) 
+                tie(Transpiler.InString, Transpiler.LastQuote) = save;
+
             bool c;
             tie(c, s) = ReplaceInstances(s, name, value, m[name]);
 
             if (c)
                 m[name] = b = true;
+            
+            if (!i)
+                save = {Transpiler.InString, Transpiler.LastQuote};
+            i++;
         }
-        tie(Transpiler.InString, Transpiler.LastQuote) = save;
     }
     return s;
 }
