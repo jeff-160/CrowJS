@@ -1,5 +1,6 @@
 #pragma once
 #define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
+#define STARTSWITH(s, f) !s.rfind(f)
 #define TUP Transpiler.InString, Transpiler.LastQuote, Transpiler.InComment
 
 
@@ -121,7 +122,7 @@ string JSTranspiler::Transpile(){
 
         string tline = Trim(line);
 
-        if (!tline.rfind("#", 0)){
+        if (STARTSWITH(line, "#")){
             vector<string> args = Split(tline, ' ');
             
             if (args[0]==Syntax::Define.Keyword){
@@ -131,10 +132,10 @@ string JSTranspiler::Transpile(){
                 Syntax::Define.Callback(GetArgs(tline, 2));
             }
             else
-                preend || (args[0]=="#!" && Transpiler.CurrentLine==1) ? result.push_back(line) : Error("#define should be used to declare a macro");
+                preend || (STARTSWITH(line, "#!") && Transpiler.CurrentLine==1) ? result.push_back(line) : Error("#define should be used to declare a macro");
         }
         else{
-            if (line.size())
+            if (line.size() && !STARTSWITH(line, "//"))
                 preend = true;
             result.push_back(this->ReplaceMacro(line));
         }
