@@ -1,5 +1,7 @@
 #pragma once
 #define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
+#define TUP Transpiler.InString, Transpiler.LastQuote
+
 
 static inline bool CheckBefore(const string& s, const string& f, size_t p, size_t c){
     size_t i = s.find(f, p);
@@ -79,27 +81,28 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 string JSTranspiler::ReplaceMacro(string s){
     bool b = true;
     unordered_map<string, bool> m;
-    tuple<bool, char> save = {false, NULL};
+    tuple<bool, char> ss, is, ls; 
+        ss = is = ls = {TUP};
 
     while (b){
-        size_t i = 0;
         b = false;
 
+        ls = {TUP};
         for (auto [name, value] : Syntax::Definitions){
-            if (get<1>(save)!=NULL) 
-                tie(Transpiler.InString, Transpiler.LastQuote) = save;
-
+            tie(TUP) = ls;
+            
             bool c;
             tie(c, s) = ReplaceInstances(s, name, value, m[name]);
 
             if (c)
                 m[name] = b = true;
-            
-            if (!i)
-                save = {Transpiler.InString, Transpiler.LastQuote};
-            i++;
+
+            is = {TUP};
         }
+        tie(TUP) = ss;
     }
+    tie(TUP) = is;
+
     return s;
 }
 
