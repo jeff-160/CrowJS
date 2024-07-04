@@ -1,6 +1,6 @@
 #pragma once
 #define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL
-#define TUP Transpiler.InString, Transpiler.LastQuote
+#define TUP Transpiler.InString, Transpiler.LastQuote, Transpiler.InComment
 
 
 static inline bool CheckBefore(const string& s, const string& f, size_t p, size_t c){
@@ -28,6 +28,11 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
     size_t pos = 0;
     while (pos<line.size()){
+        for (size_t i=0;i<=1;i++){
+            if (pos==line.find(Syntax::Comments[i], pos))
+                Transpiler.InComment = !i;
+        }
+
         if (regex_match(string(1, line[pos]), quotes) && (Transpiler.LastQuote==NULL || Transpiler.LastQuote==line[pos])){
             Transpiler.InString = !Transpiler.InString;
 
@@ -47,7 +52,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
             }
         }
 
-        if (!Transpiler.InString){
+        if (!Transpiler.InString && !Transpiler.InComment){
             size_t nextmacro = line.find(macro, pos);
             for (char c : Syntax::Quotes){
                 if (CheckBefore(line, string(1, c), pos, nextmacro))
@@ -81,7 +86,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 string JSTranspiler::ReplaceMacro(string s){
     bool b = true;
     unordered_map<string, bool> m;
-    tuple<bool, char> ss, is, ls; 
+    tuple<bool, char, bool> ss, is, ls; 
         ss = is = ls = {TUP};
 
     while (b){

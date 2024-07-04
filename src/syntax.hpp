@@ -15,6 +15,7 @@ static bool CheckName(const string& name){
 
 namespace Syntax{
     const string Quotes = "`'\"";
+    const string Comments[2] = {"/*", "*/"};
 
     unordered_map<string, string> Definitions{
         {"__DATE__", "new Date().toString().match(/\\w+ \\d+ \\d+/)[0]"},
