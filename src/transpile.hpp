@@ -28,7 +28,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
     size_t pos = 0;
     while (pos<line.size()){
-        for (size_t i=0;i<=1;i++){
+        for (size_t i=0;i<=!Transpiler.InString;i++){
             if (pos==line.find(Syntax::Comments[i], pos))
                 Transpiler.InComment = !i;
         }
