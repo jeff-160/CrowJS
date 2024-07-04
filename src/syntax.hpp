@@ -18,13 +18,6 @@ namespace Syntax{
     const string Comments[2] = {"/*", "*/"};
     const string Interpolate[2] = {"${", "}"};
 
-    unordered_map<string, string> Definitions{
-        {"__DATE__", "new Date().toString().match(/\\w+ \\d+ \\d+/)[0]"},
-        {"__TIME__", "new Date().toString().match(/\\d+:\\d+:\\d+/)[0]"},
-        {"__FILE__", "new Error().stack.match(/\\/([\\w.]+):\\d+/)[1]"},
-        {"__LINE__", "new Error().stack.match(/:(\\d+):/)[1]"},
-    };
-
     struct {
         const string Keyword = "#define";
 
@@ -34,7 +27,7 @@ namespace Syntax{
             if (!CheckName(args[1])) 
                 Error("Macro name must be identifier");
 
-            Definitions[args[1]] = args.size()<3 ? "" : args[2];
+            Transpiler.Definitions[args[1]] = args.size()<3 ? "" : args[2];
         }
     } Define;
 }

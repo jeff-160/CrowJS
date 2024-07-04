@@ -83,7 +83,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
         return {c, line};
 }
 
-string JSTranspiler::ReplaceMacro(string s){
+static string ReplaceMacro(string s){
     bool b = true;
     unordered_map<string, bool> m;
     tuple<bool, char, bool> ss, is, ls; 
@@ -93,7 +93,7 @@ string JSTranspiler::ReplaceMacro(string s){
         b = false;
 
         ls = {TUP};
-        for (auto [name, value] : Syntax::Definitions){
+        for (auto [name, value] : Transpiler.Definitions){
             tie(TUP) = ls;
             
             bool c;
@@ -136,7 +136,7 @@ string JSTranspiler::Transpile(){
         else{
             if (line.size() && line.rfind("//"))
                 preend = true;
-            result.push_back(this->ReplaceMacro(line));
+            result.push_back(ReplaceMacro(line));
         }
     }
 
