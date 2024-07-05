@@ -1,40 +1,7 @@
 #pragma once
-#define ISENTER(STR) pos==line.find(STR, pos)
-#define REGQUOTES regex("["+Syntax::Quotes+"]")
-#define ISQUOTE(STR) regex_match(STR, REGQUOTES) 
-#define ISINTERPOLATE(STR) regex_match(STR, regex("["+Syntax::Interpolate[0]+Syntax::Interpolate[1]+"]"))
-#define TUP Transpiler.StringStack, Transpiler.InComment
+#define RESET Transpiler.InString = false; Transpiler.LastQuote = NULL;
+#define TUP Transpiler.InString, Transpiler.LastQuote, Transpiler.InComment, Transpiler.InInterpolate
 
-
-bool JSTranspiler::InString(){
-    return this->StringStack.size() && regex_match(this->StringStack.back(), REGQUOTES);
-}
-
-void RemoveString(){
-    for (int i=Transpiler.StringStack.size()-1;i>=0;i--){
-        if (ISQUOTE(Transpiler.StringStack[i]))
-            return (void)Transpiler.StringStack.erase(Transpiler.StringStack.begin()+i);
-    }
-}
-
-bool JSTranspiler::InInterpolate(){
-    return this->StringStack.size() && ISINTERPOLATE(this->StringStack.back());
-}
-
-void RemoveInterpolate(){
-    for (int i=Transpiler.StringStack.size()-1;i>=0;i--){
-        if (Transpiler.StringStack[i]==Syntax::Interpolate[0])
-            return (void)Transpiler.StringStack.erase(Transpiler.StringStack.begin()+i);
-    }
-}
-
-string JSTranspiler::LastQuote(){
-    for (int i=this->StringStack.size()-1;i>=0;i--){
-        if (ISQUOTE(this->StringStack[i]))
-            return this->StringStack[i];
-    }
-    return "";
-}
 
 static inline bool CheckBefore(const string& s, const string& f, size_t p, size_t c){
     size_t i = s.find(f, p);
@@ -55,41 +22,56 @@ static constexpr bool IsEscape(const string& s, int p){
     return t%2;
 }
 
+static void CheckIn(const string& line, size_t pos, const string (&syn)[2], bool& state){
+    for (size_t i=0;i<=1;i++){
+        if (pos==line.find(syn[i], pos))
+            state = !i;
+    }
+}
+
 static pair<bool, string> ReplaceInstances(string line, const string& macro, const string& value, bool exclude){
     bool c = false;
+    regex quotes("["+Syntax::Quotes+"]");
 
     size_t pos = 0;
     while (pos<line.size()){
-        if (!Transpiler.InString()){
-            if (ISENTER(Syntax::Comment))
-                break;
+        if (!Transpiler.InString)
+            CheckIn(line, pos, Syntax::MComment, Transpiler.InComment);
 
-            for (size_t i=0;i<=1;i++){
-                if (ISENTER(Syntax::MComment[i]))
-                    Transpiler.InComment = !i;
+        if (Transpiler.LastQuote=='`')
+            CheckIn(line, pos, Syntax::Interpolate, Transpiler.InInterpolate);
+
+        if (!Transpiler.InComment && regex_match(string(1, line[pos]), quotes) && (Transpiler.LastQuote==NULL || Transpiler.LastQuote==line[pos])){
+            Transpiler.InString = !Transpiler.InString;
+
+            if (Transpiler.InString){
+                Transpiler.LastQuote = line[pos];
+
+                // size_t nextquote = line.find(Transpiler.LastQuote, pos+1);
+                // if (nextquote==string::npos || IsEscape(line, nextquote-1))
+                //     break;
+                
+                // pos = nextquote+1;
+                // RESET;
+                // continue;
+            }
+            else{
+                RESET;
             }
         }
 
-        for (size_t i=0;i<=1;i++){
-            if (ISENTER(Syntax::Interpolate[i]) && Transpiler.LastQuote()=="`")
-                i ? RemoveInterpolate() : Transpiler.StringStack.push_back(Syntax::Interpolate[0]);
-        }
-
-        if (
-            !Transpiler.InComment && 
-            ISQUOTE(string(1, line[pos])) && 
-            !IsEscape(line, pos-1)
-        ) Transpiler.InString() ? RemoveString() : Transpiler.StringStack.push_back(string(1, line[pos]));
-
-        if (!Transpiler.InString() && !Transpiler.InComment){
+        if ((!Transpiler.InString || Transpiler.InInterpolate) && !Transpiler.InComment){
             size_t nextmacro = line.find(macro, pos);
             for (char c : Syntax::Quotes){
                 if (CheckBefore(line, string(1, c), pos, nextmacro))
                     goto inc;
             }
 
+            if (Transpiler.InInterpolate && CheckBefore(line, Syntax::Interpolate[1], pos, nextmacro))
+                goto inc;
+
             if (CheckBefore(line, Syntax::Comment, pos, nextmacro))
-                break;
+                goto end;
 
             if (nextmacro!=string::npos){
                 if (exclude)
@@ -104,16 +86,18 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
             pos++;
     }
 
-    if (Transpiler.LastQuote()!="`" && Transpiler.InString())
-        Transpiler.StringStack.pop_back();
+    if (Transpiler.LastQuote!='`'){
+        RESET;
+    }
 
-    return {c, line};
+    end:
+        return {c, line};
 }
 
 static string ReplaceMacro(string s){
     bool b = true;
     unordered_map<string, bool> m;
-    tuple<vector<string>, bool> ss, is, ls; 
+    tuple<bool, char, bool, bool> ss, is, ls; 
         ss = is = ls = {TUP};
 
     while (b){
@@ -132,7 +116,6 @@ static string ReplaceMacro(string s){
             is = {TUP};
         }
         tie(TUP) = ss;
-        break;
     }
     tie(TUP) = is;
 

@@ -37,7 +37,6 @@ vector<string> Split(const string& s, char d){
 
 #define ADD string tb = Trim(b); if (tb.size()) { v.push_back(tb); t--; }
 vector<string> GetArgs(const string& s, size_t t){
-
     vector<string> v;
     string b;
 
