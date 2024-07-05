@@ -21,6 +21,6 @@ Process exited after 0.457053 seconds
 
 
 ## See more
-- [Documentation](documentation.md){:target="_blank" rel="noopener"}
+- [Documentation](documentation.md)
 - [Object-like macros](https://gcc.gnu.org/onlinedocs/cpp/Object-like-Macros.html)
 - https://www.youtube.com/watch?v=uOiccQx20d8
