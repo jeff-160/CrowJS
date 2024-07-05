@@ -1,9 +1,9 @@
 <p align="center"><img src="logo.png" width=200></p>
 
-CrowJS is a JavaScript superset that has C++ style macros, which can provide convenience when programming by reducing repetitive code.
+CrowJS is a JavaScript superset that has C++ style macros, seeking to provide convenience when programming by reducing repetitive code.
 
 
-## Getting Started
+## Getting started
 Write your code
 ```javascript
 // myfile.js
@@ -21,4 +21,6 @@ Process exited after 0.457053 seconds
 
 
 ## See more
-[Documentation](documentation.md)
+- [Documentation](documentation.md)
+- [Object-like macros](https://gcc.gnu.org/onlinedocs/cpp/Object-like-Macros.html)
+- https://www.youtube.com/watch?v=uOiccQx20d8
