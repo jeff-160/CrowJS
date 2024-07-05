@@ -10,7 +10,6 @@
 #include <fstream>
 #include <numeric>
 #include <algorithm>
-#include <cstdlib>
 #include <chrono>
 
 using namespace std;

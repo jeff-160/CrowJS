@@ -5,11 +5,10 @@ inline string Replace(const string& s, const string& c, const string& d){
 }
 
 void Error(const string& message, bool debug=true){
-    if (debug)
-        cout << Transpiler.CurrentFile+":"+to_string(Transpiler.CurrentLine)+": "+message+"\n\t"+Transpiler.CurrentCode;
-
-    else
-        system(string("powershell -command Write-Host "+Replace(message, "#", "`#")+" -ForegroundColor 'red'").c_str());
+    cout << (debug ? 
+        Transpiler.CurrentFile+":"+to_string(Transpiler.CurrentLine)+": "+message+"\n\t"+Transpiler.CurrentCode :
+        "CrowJS: "+message
+    );
     exit(0);
 }
 

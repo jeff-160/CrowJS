@@ -2,15 +2,15 @@
 #define ISENTER(STR) pos==line.find(STR, pos)
 #define REGQUOTES regex("["+Syntax::Quotes+"]")
 #define ISQUOTE(STR) regex_match(STR, REGQUOTES) 
-#define ISINTERPOLATE(STR) regex_match(STR, regex("["+Syntax::Interpolate[0]+Syntax::Interpolate[1]+"]"))
-#define TUP Transpiler.StringStack, Transpiler.InComment
+#define ISINTERPOLATE(STR) STR==Syntax::Interpolate[0]
+#define PAIR Transpiler.StringStack, Transpiler.InComment
 
 
 bool JSTranspiler::InString(){
-    return this->StringStack.size() && regex_match(this->StringStack.back(), REGQUOTES);
+    return this->StringStack.size() && ISQUOTE(this->StringStack.back());
 }
 
-void RemoveString(){
+static void RemoveString(){
     for (int i=Transpiler.StringStack.size()-1;i>=0;i--){
         if (ISQUOTE(Transpiler.StringStack[i]))
             return (void)Transpiler.StringStack.erase(Transpiler.StringStack.begin()+i);
@@ -21,9 +21,9 @@ bool JSTranspiler::InInterpolate(){
     return this->StringStack.size() && ISINTERPOLATE(this->StringStack.back());
 }
 
-void RemoveInterpolate(){
+static void RemoveInterpolate(){
     for (int i=Transpiler.StringStack.size()-1;i>=0;i--){
-        if (Transpiler.StringStack[i]==Syntax::Interpolate[0])
+        if (ISINTERPOLATE(Transpiler.StringStack[i]))
             return (void)Transpiler.StringStack.erase(Transpiler.StringStack.begin()+i);
     }
 }
@@ -55,10 +55,10 @@ static constexpr bool IsEscape(const string& s, int p){
     return t%2;
 }
 
-static inline bool IsIdentifier(const string& s, int p){
-    auto m = [](char c) -> bool { return regex_match(string(1, c), Syntax::Name); };
+static inline bool IsIdentifier(const string& s, int a, int b){
+    auto m = [s](int i) -> bool { return !regex_match(string(1, s[i]), Syntax::Name); };
 
-    return (!p || !m(s[p-1]))+(p>=s.size()-1 || !m(s[p+1]))==2;
+    return (!a || m(a-1))+(b>s.size()-2 || m(b+1))==2;
 }
 
 static pair<bool, string> ReplaceInstances(string line, const string& macro, const string& value, bool exclude){
@@ -89,15 +89,16 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
         if (!Transpiler.InString() && !Transpiler.InComment){
             size_t nextmacro = line.find(macro, pos);
-            for (char c : Syntax::Quotes){
-                if (CheckBefore(line, string(1, c), pos, nextmacro))
-                    goto inc;
-            }
 
-            if (CheckBefore(line, Syntax::Comment, pos, nextmacro))
-                break;
+            if (nextmacro!=string::npos && IsIdentifier(line, nextmacro, nextmacro+macro.size()-1)){
+                for (char c : Syntax::Quotes){
+                    if (CheckBefore(line, string(1, c), pos, nextmacro))
+                        goto inc;
+                }
 
-            if (nextmacro!=string::npos && IsIdentifier(line, nextmacro)){
+                if (CheckBefore(line, Syntax::Comment, pos, nextmacro))
+                    break;
+
                 if (exclude)
                     Error("Recursive macro is not allowed");
                 c = true;
@@ -119,15 +120,15 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 static string ReplaceMacro(string s){
     bool b = true;
     unordered_map<string, bool> m;
-    tuple<vector<string>, bool> ss, is, ls; 
-        ss = is = ls = {TUP};
+    pair<vector<string>, bool> ss, is, ls; 
+        ss = is = ls = {PAIR};
 
     while (b){
         b = false;
 
-        ls = {TUP};
+        ls = {PAIR};
         for (auto [name, value] : Transpiler.Definitions){
-            tie(TUP) = ls;
+            tie(PAIR) = ls;
             
             bool c;
             tie(c, s) = ReplaceInstances(s, name, value, m[name]);
@@ -135,12 +136,11 @@ static string ReplaceMacro(string s){
             if (c)
                 m[name] = b = true;
 
-            is = {TUP};
+            is = {PAIR};
         }
-        tie(TUP) = ss;
-        break;
+        tie(PAIR) = ss;
     }
-    tie(TUP) = is;
+    tie(PAIR) = is;
 
     return s;
 }
