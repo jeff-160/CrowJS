@@ -4,8 +4,15 @@ CrowJS is a JavaScript superset that has C++ style macros, which can provide con
 
 
 ## Getting Started
+Write your code
+```javascript
+// myfile.js
+#define MACRO console.log(__DATE__)
 
-Transpiling to JavaScript
+MACRO;
+```
+
+Transpile to JavaScript
 ```batch
 > crow myfile.js
 Transpiled to myfile.js
