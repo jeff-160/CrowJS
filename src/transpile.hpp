@@ -29,7 +29,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
     size_t pos = 0;
     while (pos<line.size()){
         for (size_t i=0;i<=!Transpiler.InString;i++){
-            if (pos==line.find(Syntax::Comments[i], pos))
+            if (pos==line.find(Syntax::MComment[i], pos))
                 Transpiler.InComment = !i;
         }
 
@@ -59,7 +59,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
                     goto inc;
             }
 
-            if (CheckBefore(line, "//", pos, nextmacro))
+            if (CheckBefore(line, Syntax::Comment, pos, nextmacro))
                 goto end;
 
             if (nextmacro!=string::npos){
@@ -115,29 +115,38 @@ string JSTranspiler::Transpile(){
     vector<string> result;
     bool preend = false;
 
-    for (string line : this->Lines){
-        this->CurrentCode = line;
+    for (size_t i=0;i<this->Lines.size();){
+        this->CurrentCode = this->Lines[i];
         this->CurrentLine++;
 
-        string tline = Trim(line);
+        string tline = Trim(this->CurrentCode);
 
-        if (!line.rfind("#")){
+        if (!this->CurrentCode.rfind("#")){
             vector<string> args = Split(tline, ' ');
             
             if (args[0]==Syntax::Define.Keyword){
+                while (i<this->Lines.size()-1 && RTrim(this->Lines[i]).back()=='\\'){
+                    i++;
+                    tline.pop_back();
+                    tline+=RTrim(this->Lines[i]);
+                }
+
                 if (preend)
                     Error("Macro should be defined at top of file");
 
                 Syntax::Define.Callback(GetArgs(tline, 2));
             }
             else
-                preend || (!line.rfind("#!") && Transpiler.CurrentLine==1) ? result.push_back(line) : Error("#define should be used to declare a macro");
+                preend || (!this->CurrentCode.rfind("#!") && Transpiler.CurrentLine==1) ? 
+                    result.push_back(this->CurrentCode) : Error("#define should be used to declare a macro");
         }
         else{
-            if (line.size() && line.rfind("//"))
+            if (this->CurrentCode.size() && this->CurrentCode.rfind(Syntax::Comment) && this->CurrentCode.rfind(Syntax::MComment[0]))
                 preend = true;
-            result.push_back(ReplaceMacro(line));
+            result.push_back(ReplaceMacro(this->CurrentCode));
         }
+
+        i++;
     }
 
     return accumulate(next(result.begin()), result.end(), result[0], [](string a, string b) {return a+"\n"+b;});

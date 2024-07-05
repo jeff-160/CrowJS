@@ -15,7 +15,8 @@ static bool CheckName(const string& name){
 
 namespace Syntax{
     const string Quotes = "`'\"";
-    const string Comments[2] = {"/*", "*/"};
+    const string Comment = "//";
+    const string MComment[2] = {"/*", "*/"};
     const string Interpolate[2] = {"${", "}"};
 
     struct {
