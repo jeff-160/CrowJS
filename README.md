@@ -1,4 +1,4 @@
-<p align="center"><img src="logo.png" width=200></p>
+<img src="logo-big.png" width=400>
 
 CrowJS is a JavaScript superset that has C++ style macros, seeking to provide convenience when programming by reducing repetitive code.
 
