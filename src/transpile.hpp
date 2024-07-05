@@ -55,6 +55,12 @@ static constexpr bool IsEscape(const string& s, int p){
     return t%2;
 }
 
+static inline bool IsIdentifier(const string& s, int p){
+    auto m = [](char c) -> bool { return regex_match(string(1, c), Syntax::Name); };
+
+    return (!p || !m(s[p-1]))+(p>=s.size()-1 || !m(s[p+1]))==2;
+}
+
 static pair<bool, string> ReplaceInstances(string line, const string& macro, const string& value, bool exclude){
     bool c = false;
 
@@ -91,7 +97,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
             if (CheckBefore(line, Syntax::Comment, pos, nextmacro))
                 break;
 
-            if (nextmacro!=string::npos){
+            if (nextmacro!=string::npos && IsIdentifier(line, nextmacro)){
                 if (exclude)
                     Error("Recursive macro is not allowed");
                 c = true;
