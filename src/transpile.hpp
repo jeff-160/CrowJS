@@ -7,7 +7,7 @@
 
 
 bool JSTranspiler::InString(){
-    return this->StringStack.size() && ISQUOTE(this->StringStack.back());
+    return !this->StringStack.empty() && ISQUOTE(this->StringStack.back());
 }
 
 static void RemoveString(){
@@ -18,7 +18,7 @@ static void RemoveString(){
 }
 
 bool JSTranspiler::InInterpolate(){
-    return this->StringStack.size() && ISINTERPOLATE(this->StringStack.back());
+    return !this->StringStack.empty() && ISINTERPOLATE(this->StringStack.back());
 }
 
 static void RemoveInterpolate(){
@@ -96,8 +96,10 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
                         goto inc;
                 }
 
-                if (CheckBefore(line, Syntax::Comment, pos, nextmacro))
-                    break;
+                if (
+                    CheckBefore(line, Syntax::Comment, pos, nextmacro) ||
+                    CheckBefore(line, Syntax::Interpolate[1], pos, nextmacro)
+                ) break;
 
                 if (exclude)
                     Error("Recursive macro is not allowed");
@@ -175,7 +177,7 @@ string JSTranspiler::Transpile(){
                     result.push_back(this->CurrentCode) : Error("#define should be used to declare a macro");
         }
         else{
-            if (tline.size() && tline.rfind(Syntax::Comment) && tline.rfind(Syntax::MComment[0]))
+            if (!tline.empty() && tline.rfind(Syntax::Comment) && tline.rfind(Syntax::MComment[0]))
                 preend = true;
             result.push_back(ReplaceMacro(this->CurrentCode));
         }
@@ -183,8 +185,5 @@ string JSTranspiler::Transpile(){
         i++;
     }
 
-    string r = "";
-    for (string i : result)
-        r+=i;
-    return r;
+    return accumulate(result.begin(), result.end(), string(), [](string &r, const string &s) { return r.empty() ? s : r+"\n"+s; });
 }

@@ -28,13 +28,13 @@ vector<string> Split(const string& s, char d){
     string t;
 
     while (getline(ss, t, d))
-        if (t.size())
+        if (!t.empty())
             v.push_back(t);
 
     return v;
 }
 
-#define ADD string tb = Trim(b); if (tb.size()) { v.push_back(tb); t--; }
+#define ADD string tb = Trim(b); if (!tb.empty()) { v.push_back(tb); t--; }
 vector<string> GetArgs(const string& s, size_t t){
     vector<string> v;
     string b;
