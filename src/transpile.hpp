@@ -183,5 +183,8 @@ string JSTranspiler::Transpile(){
         i++;
     }
 
-    return accumulate(next(result.begin()), result.end(), result[0], [](string a, string b) {return a+"\n"+b;});
+    string r = "";
+    for (string i : result)
+        r+=i;
+    return r;
 }
