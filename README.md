@@ -1,9 +1,14 @@
-<img src="resources/logo-big.png" width=500>
+<img src="resources/logo-big.png">
 
 CrowJS is a JavaScript superset that has C++ style macros, seeking to provide convenience when programming by reducing repetitive code.
 
 
 ## Getting started
+Set up CrowJS by running the `build.bat` file
+```batch
+> build.bat
+```
+
 Write your code
 ```javascript
 // myfile.js
@@ -16,7 +21,7 @@ Transpile to JavaScript
 ```batch
 > crow myfile.js
 Transpiled to myfile.js
-Process exited after 0.457053 seconds
+Process exited after 0.050005 seconds
 ```
 
 
