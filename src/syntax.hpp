@@ -1,18 +1,14 @@
 #pragma once
 
 namespace Syntax{
-    const regex Name("[_a-z0-9]", regex_constants::icase);
+    const regex Name("[_a-z0-9]+", regex_constants::icase);
+    const regex FuncName("([_a-z0-9]+)\\((.*)\\)", regex_constants::icase);
 
-    static bool CheckName(const string& name){
+    static int NameType(const string& name){
         if (!regex_match(string(1, name[0]), regex("[_a-z]", regex_constants::icase)))
-            return false;
+            return 0;
 
-        for (char c : name){
-            if (!regex_match(string(1, c), Syntax::Name))
-                return false;
-        }
-        
-        return true;
+        return regex_match(name, Name) ? 1 : regex_match(name, FuncName) ? 2 : 0;
     }
 
     const string Quotes = "`'\"";
@@ -26,10 +22,25 @@ namespace Syntax{
         void Callback(const vector<string>& args) {
             if (args.size()<2) 
                 Error("No macro name given in "+args[0]+" directive");
-            if (!Syntax::CheckName(args[1]))
+
+            int type = NameType(args[1]);
+            if (!type)
                 Error("Macro name must be identifier");
 
-            Transpiler.Definitions[args[1]] = args.size()<3 ? "" : args[2];
+            string name = args[1];
+            unordered_map<string, string> params;
+
+            if (type==2){
+                smatch m;
+                regex_search(name, m, FuncName);
+
+                for (auto i: GetFuncArgs(m[2]))
+                    params[i] = "";
+                    
+                name = string(m[1])+"\\(([^)]*)\\)";
+            }
+            
+            Transpiler.Definitions[name] = Macro(args.size()<3 ? "" : args[2], type==2, params);
         }
     } Define;
 }

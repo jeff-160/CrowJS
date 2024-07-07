@@ -12,6 +12,10 @@ void Error(const string& message, bool debug=true){
     exit(0);
 }
 
+inline string Join(const vector<string>& v, string delim){
+    return accumulate(v.begin(), v.end(), string(), [delim](string &r, const string &s) { return r.empty() ? s : r+delim+s; });
+}
+
 inline string Trim(string s){
     s.erase(s.begin(), find_if(s.begin(), s.end(), [](int c) {return !isspace(c);}));
     return s;
@@ -38,9 +42,15 @@ vector<string> Split(const string& s, char d){
 vector<string> GetArgs(const string& s, size_t t){
     vector<string> v;
     string b;
+    bool br = false;
 
     for (char c : s){
-        if (c==' ' && t){
+        if (c=='(')
+            br = true;
+        if (c==')')
+            br = false;
+
+        if (c==' ' && !br && t){
             ADD;
             b = "";
             continue;
@@ -49,5 +59,13 @@ vector<string> GetArgs(const string& s, size_t t){
     }
     ADD;
     
+    return v;
+}
+
+vector<string> GetFuncArgs(const string& s){
+    vector<string> v = Split(s, ',');
+    for (size_t i=0;i<v.size();i++)
+        v[i] = Trim(v[i]);
+
     return v;
 }

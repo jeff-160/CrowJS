@@ -61,7 +61,26 @@ static inline bool IsIdentifier(const string& s, int a, int b){
     return (!a || m(a-1))+(b>s.size()-2 || m(b+1))==2;
 }
 
-static pair<bool, string> ReplaceInstances(string line, const string& macro, const string& value, bool exclude){
+static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>& def);
+
+static string ReplaceFunction(const Syntax::Macro& macro, const string& params){
+    unordered_map<string, Syntax::Macro> copydef = Transpiler.Definitions;
+
+    vector<string> args = GetFuncArgs(params);
+    size_t nargs = macro.Params.size();
+    if (args.size()!=nargs)
+        Error("Macro function expected "+to_string(nargs)+" arguments, got "+to_string(args.size()));
+    
+    size_t i=0;
+    for (auto [k, _] : macro.Params){
+        copydef[k] = args[i];
+        i++;
+    }
+
+    return ReplaceMacro(macro.Value, copydef);
+}
+
+static pair<bool, string> ReplaceInstances(string line, const string& macro, const Syntax::Macro& repr, bool exclude){
     bool c = false;
 
     size_t pos = 0;
@@ -88,9 +107,12 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
         ) Transpiler.InString() ? RemoveString() : Transpiler.StringStack.push_back(string(1, line[pos]));
 
         if (!Transpiler.InString() && !Transpiler.InComment){
-            size_t nextmacro = line.find(macro, pos);
+            smatch m;
+            string sstr = line.substr(pos);
+            bool found = regex_search(sstr, m, regex(macro));
+            size_t nextmacro = pos+m.position();
 
-            if (nextmacro!=string::npos && IsIdentifier(line, nextmacro, nextmacro+macro.size()-1)){
+            if (found && IsIdentifier(line, nextmacro, nextmacro+string(m[0]).size()-1)){
                 for (char c : Syntax::Quotes){
                     if (CheckBefore(line, string(1, c), pos, nextmacro))
                         goto inc;
@@ -104,7 +126,9 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
                 if (exclude)
                     Error("Recursive macro is not allowed");
                 c = true;
-                line.replace(nextmacro, macro.size(), value);
+                
+                string value = repr.IsFunction ? ReplaceFunction(repr, m[1]) : repr.Value;
+                line.replace(nextmacro, string(m[0]).size(), value);
                 pos = nextmacro+value.size()-1;
             }
         }
@@ -119,7 +143,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
     return {c, line};
 }
 
-static string ReplaceMacro(string s){
+static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>& def){
     bool b = true;
     unordered_map<string, bool> m;
     pair<vector<string>, bool> ss, is, ls; 
@@ -129,11 +153,11 @@ static string ReplaceMacro(string s){
         b = false;
 
         ls = {PAIR};
-        for (auto [name, value] : Transpiler.Definitions){
+        for (auto [name, repr] : def){
             tie(PAIR) = ls;
             
             bool c;
-            tie(c, s) = ReplaceInstances(s, name, value, m[name]);
+            tie(c, s) = ReplaceInstances(s, name, repr, m[name]);
 
             if (c)
                 m[name] = b = true;
@@ -179,11 +203,11 @@ string JSTranspiler::Transpile(){
         else{
             if (!tline.empty() && tline.rfind(Syntax::Comment) && tline.rfind(Syntax::MComment[0]))
                 preend = true;
-            result.push_back(ReplaceMacro(this->CurrentCode));
+            result.push_back(ReplaceMacro(this->CurrentCode, Transpiler.Definitions));
         }
 
         i++;
     }
 
-    return accumulate(result.begin(), result.end(), string(), [](string &r, const string &s) { return r.empty() ? s : r+"\n"+s; });
+    return Join(result, "\n");
 }
