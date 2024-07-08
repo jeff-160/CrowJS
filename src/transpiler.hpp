@@ -4,10 +4,10 @@ namespace Syntax {
     struct Macro {
         string Value;
         bool IsFunction;
-        unordered_map<string, string> Params;
+        vector<string> Params;
 
         Macro() {}
-        Macro(string v, bool i=false, unordered_map<string, string> p={}) : Value(v), IsFunction(i), Params(p) {}
+        Macro(string v, bool i=false, vector<string> p={}) : Value(v), IsFunction(i), Params(p) {}
     };
 }
 
@@ -16,7 +16,7 @@ struct JSTranspiler{
     vector<string> Lines;
     int CurrentLine = 0;
 
-    bool InComment = false;
+    bool InComment = false, InRegex = false;
     vector<string> StringStack;
 
     unordered_map<string, Syntax::Macro> Definitions{

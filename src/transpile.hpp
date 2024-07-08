@@ -71,11 +71,8 @@ static string ReplaceFunction(const Syntax::Macro& macro, const string& params){
     if (args.size()!=nargs)
         Error("Macro function expected "+to_string(nargs)+" arguments, got "+to_string(args.size()));
     
-    size_t i=0;
-    for (auto [k, _] : macro.Params){
-        copydef[k] = args[i];
-        i++;
-    }
+    for (size_t i=0;i<nargs;i++)
+        copydef[macro.Params[i]] = args[i];
 
     return ReplaceMacro(macro.Value, copydef);
 }
@@ -113,6 +110,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
             size_t nextmacro = pos+m.position();
 
             if (found && IsIdentifier(line, nextmacro, nextmacro+string(m[0]).size()-1)){
+
                 for (char c : Syntax::Quotes){
                     if (CheckBefore(line, string(1, c), pos, nextmacro))
                         goto inc;
@@ -120,7 +118,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
                 if (
                     CheckBefore(line, Syntax::Comment, pos, nextmacro) ||
-                    CheckBefore(line, Syntax::Interpolate[1], pos, nextmacro)
+                    (CheckBefore(line, Syntax::Interpolate[1], pos, nextmacro) && !CheckBefore(line, Syntax::Interpolate[0], pos, nextmacro))
                 ) break;
 
                 if (exclude)

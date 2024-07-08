@@ -28,14 +28,13 @@ namespace Syntax{
                 Error("Macro name must be identifier");
 
             string name = args[1];
-            unordered_map<string, string> params;
+            vector<string> params;
 
             if (type==2){
                 smatch m;
                 regex_search(name, m, FuncName);
 
-                for (auto i: GetFuncArgs(m[2]))
-                    params[i] = "";
+                params = GetFuncArgs(m[2]);
                     
                 name = string(m[1])+"\\(([^)]*)\\)";
             }

@@ -63,6 +63,10 @@ vector<string> GetArgs(const string& s, size_t t){
 }
 
 vector<string> GetFuncArgs(const string& s){
+    vector<string> v;
+    char LastQuote = NULL;
+
+
     vector<string> v = Split(s, ',');
     for (size_t i=0;i<v.size();i++)
         v[i] = Trim(v[i]);
