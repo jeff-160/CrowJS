@@ -86,10 +86,17 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
                 break;
 
             for (size_t i=0;i<=1;i++){
-                if (ISENTER(Syntax::MComment[i]))
+                if (ISENTER(Syntax::MComment[i])){
                     Transpiler.InComment = !i;
+                    goto cend;
+                }
             }
+
+            if (!Transpiler.InComment && line[pos]=='/' && (pos>=line.size()-1 || line[pos+1]!='/'))
+                Transpiler.InRegex = !Transpiler.InRegex;
         }
+
+        cend:
 
         for (size_t i=0;i<=1;i++){
             if (ISENTER(Syntax::Interpolate[i]) && Transpiler.LastQuote()=="`"){
@@ -103,7 +110,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
             !IsEscape(line, pos-1)
         ) Transpiler.InString() ? RemoveString() : Transpiler.StringStack.push_back(string(1, line[pos]));
 
-        if (!Transpiler.InString() && !Transpiler.InComment){
+        if (!Transpiler.InString() && !Transpiler.InComment && !Transpiler.InRegex){
             smatch m;
             string sstr = line.substr(pos);
             bool found = regex_search(sstr, m, regex(macro));
