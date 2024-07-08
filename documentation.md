@@ -22,7 +22,7 @@ console.log(3.14159265)
 ---
 
 ## Function-like macros
-Functions like an object-like macro, but takes in an arbitrary number of arguments.
+Behaves like an object-like macro, but takes in an arbitrary number of arguments.
 
 Input:
 ```javascript

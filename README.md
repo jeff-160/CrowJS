@@ -4,6 +4,7 @@ CrowJS is a JavaScript superset that has C++ style macros, seeking to provide co
 
 
 ## Getting started
+
 Set up CrowJS by running the `build.bat` file
 ```batch
 > build.bat
@@ -26,6 +27,7 @@ Process exited after 0.023468 seconds
 
 
 ## See more
+
 - [Documentation](documentation.md)
 - [C++ macros](https://www.geeksforgeeks.org/cpp-macros/)
 - https://www.youtube.com/watch?v=uOiccQx20d8
