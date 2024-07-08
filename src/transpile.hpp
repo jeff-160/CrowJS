@@ -65,7 +65,7 @@ static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>&
 static string ReplaceFunction(const Syntax::Macro& macro, const string& params){
     unordered_map<string, Syntax::Macro> copydef = Transpiler.Definitions;
 
-    vector<string> args = Syntax::GetFuncArgs(params);
+    vector<string> args = GetFuncArgs(params);
     size_t nargs = macro.Params.size();
     if (args.size()!=nargs)
         Error("Macro function expected "+to_string(nargs)+" arguments, got "+to_string(args.size()));

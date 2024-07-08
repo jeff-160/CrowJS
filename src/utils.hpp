@@ -61,3 +61,5 @@ vector<string> GetArgs(const string& s, size_t t){
     
     return v;
 }
+
+vector<string> GetFuncArgs(const string& s);
