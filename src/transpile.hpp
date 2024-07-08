@@ -81,7 +81,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
     size_t pos = 0;
     while (pos<line.size()){
-        if (!Transpiler.InString()){
+        if (!Transpiler.InString() && !Transpiler.InRegex){
             if (ISENTER(Syntax::Comment))
                 break;
 
@@ -98,27 +98,27 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
         if (
             !Transpiler.InComment && 
+            !Transpiler.InRegex &&
             ISQUOTE(string(1, line[pos])) && 
             !IsEscape(line, pos-1)
         ) Transpiler.InString() ? RemoveString() : Transpiler.StringStack.push_back(string(1, line[pos]));
 
-        if (!Transpiler.InString() && !Transpiler.InComment){
+        if (!Transpiler.InString() && !Transpiler.InComment && !Transpiler.InRegex){
+            if (line[pos]=='/' && (pos<line.size()-1 ? line[pos+1]!='/' : 1)){
+                Transpiler.InRegex = !Transpiler.InRegex;
+                goto inc;
+            }
+
             smatch m;
             string sstr = line.substr(pos);
             bool found = regex_search(sstr, m, regex(macro));
             size_t nextmacro = pos+m.position();
 
-            if (found && IsIdentifier(line, nextmacro, nextmacro+string(m[0]).size()-1)){
-
+            if (found && pos==nextmacro && IsIdentifier(line, nextmacro, nextmacro+string(m[0]).size()-1)){
                 for (char c : Syntax::Quotes){
                     if (CheckBefore(line, string(1, c), pos, nextmacro))
                         goto inc;
                 }
-
-                if (
-                    CheckBefore(line, Syntax::Comment, pos, nextmacro) ||
-                    (CheckBefore(line, Syntax::Interpolate[1], pos, nextmacro) && !CheckBefore(line, Syntax::Interpolate[0], pos, nextmacro))
-                ) break;
 
                 if (exclude)
                     Error("Recursive macro is not allowed");
