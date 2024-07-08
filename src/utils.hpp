@@ -45,10 +45,7 @@ vector<string> GetArgs(const string& s, size_t t){
     bool br = false;
 
     for (char c : s){
-        if (c=='(')
-            br = true;
-        if (c==')')
-            br = false;
+        br = c=='(' ? true : c==')' ? false : br;
 
         if (c==' ' && !br && t){
             ADD;

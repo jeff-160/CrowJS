@@ -81,7 +81,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
     size_t pos = 0;
     while (pos<line.size()){
-        if (!Transpiler.InString() && !Transpiler.InRegex){
+        if (!Transpiler.InString()){
             if (ISENTER(Syntax::Comment))
                 break;
 
@@ -92,29 +92,24 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
         }
 
         for (size_t i=0;i<=1;i++){
-            if (ISENTER(Syntax::Interpolate[i]) && Transpiler.LastQuote()=="`")
-                i ? RemoveInterpolate() : Transpiler.StringStack.push_back(Syntax::Interpolate[0]);
+            if (ISENTER(Syntax::Interpolate[i]) && Transpiler.LastQuote()=="`"){
+                i ? (Transpiler.InString() ? (void)0 : RemoveInterpolate()) : Transpiler.StringStack.push_back(Syntax::Interpolate[0]);
+            }
         }
 
         if (
-            !Transpiler.InComment && 
-            !Transpiler.InRegex &&
+            !Transpiler.InComment &&
             ISQUOTE(string(1, line[pos])) && 
             !IsEscape(line, pos-1)
         ) Transpiler.InString() ? RemoveString() : Transpiler.StringStack.push_back(string(1, line[pos]));
 
-        if (!Transpiler.InString() && !Transpiler.InComment && !Transpiler.InRegex){
-            if (line[pos]=='/' && (pos<line.size()-1 ? line[pos+1]!='/' : 1)){
-                Transpiler.InRegex = !Transpiler.InRegex;
-                goto inc;
-            }
-
+        if (!Transpiler.InString() && !Transpiler.InComment){
             smatch m;
             string sstr = line.substr(pos);
             bool found = regex_search(sstr, m, regex(macro));
             size_t nextmacro = pos+m.position();
 
-            if (found && pos==nextmacro && IsIdentifier(line, nextmacro, nextmacro+string(m[0]).size()-1)){
+            if (pos==nextmacro && IsIdentifier(line, nextmacro, nextmacro+string(m[0]).size()-1)){
                 for (char c : Syntax::Quotes){
                     if (CheckBefore(line, string(1, c), pos, nextmacro))
                         goto inc;
