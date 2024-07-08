@@ -21,11 +21,11 @@ Transpile to JavaScript
 ```batch
 > crow myfile.js
 Transpiled to myfile.js
-Process exited after 0.050005 seconds
+Process exited after 0.023468 seconds
 ```
 
 
 ## See more
 - [Documentation](documentation.md)
-- [Object-like macros](https://gcc.gnu.org/onlinedocs/cpp/Object-like-Macros.html)
+- [C++ macros](https://www.geeksforgeeks.org/cpp-macros/)
 - https://www.youtube.com/watch?v=uOiccQx20d8
