@@ -17,6 +17,7 @@ for /f "tokens=3 delims=\" %%a in ("!cd!") do set "username=%%a"
 set "NEWUSER=C:\Users\%username%"
 
 set "dir=%NEWUSER%\CrowJS"
+rmdir /s /q "%dir%" > nul 2> nul
 xcopy %cd% "%dir%" /E /I /Y > nul
 cd /d "%dir%"
 
