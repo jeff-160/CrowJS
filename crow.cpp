@@ -41,8 +41,7 @@ int main(int argc, char* argv[]){
     
     tie(Transpiler.Code, Transpiler.Lines) = ReadFile(path);
     WriteFile(path, Transpiler.Transpile());
-    // cout << Transpiler.Transpile();
-
+ 
     cout << "Transpiled to "+Transpiler.CurrentFile << endl 
         << "Process exited after " << (float)(duration_cast<microseconds>(high_resolution_clock::now()-start).count())/1e6 << " seconds";
 }

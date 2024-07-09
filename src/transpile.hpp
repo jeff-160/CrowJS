@@ -93,8 +93,11 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
                 }
             }
 
-            if (!Transpiler.InComment && line[pos]=='/' && (pos>=line.size()-1 || line[pos+1]!='/'))
-                Transpiler.InRegex = !Transpiler.InRegex;
+            if (
+                !Transpiler.InComment && 
+                line[pos]=='/' && (pos>=line.size()-1 || line[pos+1]!='/') && 
+                !IsEscape(line, pos-1)
+            ) Transpiler.InRegex = !Transpiler.InRegex;
         }
 
         cend:
