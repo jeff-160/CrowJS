@@ -9,14 +9,17 @@ Macro names are replaced with its associated value.
 
 Input:
 ```javascript
-#define PI 3.14159265
+#define PI 3.141592654
+#define TAU 2*PI
 
 console.log(PI)
+console.log(TAU)
 ```
 
 Output:
 ```javascript
-console.log(3.14159265)
+console.log(3.141592654)
+console.log(2*3.141592654)
 ```
 
 ---
@@ -26,14 +29,14 @@ Behaves like an object-like macro, but takes in an arbitrary number of arguments
 
 Input:
 ```javascript
-#define cube(n) n**3
+#define pow(a, b) a**b
 
-console.log(cube(12))
+pow(2, 3)
 ```
 
 Output:
 ```javascript
-console.log(12**3)
+console.log(2**3)
 ```
 
 ---
