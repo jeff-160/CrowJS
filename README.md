@@ -21,8 +21,8 @@ MACRO;
 Transpile to JavaScript
 ```batch
 > crow myfile.js
-Transpiled to myfile.js
-Process exited after 0.023468 seconds
+Transpiled to test.js
+Process exited after 0.056123 seconds
 ```
 
 
