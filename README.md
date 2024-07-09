@@ -30,4 +30,4 @@ Process exited after 0.056123 seconds
 
 - [Documentation](docs.md)
 - <a href="https://www.geeksforgeeks.org/cpp-macros/" target="_blank" rel="noreferrer">C++ macros</a> 
-- <a href="https://www.youtube.com/watch?v=uOiccQx20d8" target="_blank" rel="noreferrer">https://www.youtube.com/watch?v=uOiccQx20d8</a>
+- <a href="https://www.youtube.com/watch?v=uOiccQx20d8" target="_blank" rel="noreferrer"></a>
