@@ -29,5 +29,5 @@ Process exited after 0.056123 seconds
 ## See more
 
 - [Documentation](docs.md)
-- [C++ macros](https://www.geeksforgeeks.org/cpp-macros/)
-- https://www.youtube.com/watch?v=uOiccQx20d8
+- <a href="https://www.geeksforgeeks.org/cpp-macros/" target="_blank" rel="noreferrer">C++ macros</a> 
+- <a href="https://www.youtube.com/watch?v=uOiccQx20d8" target="_blank" rel="noreferrer">https://www.youtube.com/watch?v=uOiccQx20d8</a>
