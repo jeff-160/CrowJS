@@ -21,11 +21,6 @@ inline string Trim(string s){
     return s;
 }
 
-inline string RTrim(string s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {return !isspace(ch); }).base(), s.end());
-    return s;
-}
-
 vector<string> Split(const string& s, char d){
     stringstream ss(s);
     vector<string> v;

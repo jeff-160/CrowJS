@@ -188,10 +188,10 @@ string JSTranspiler::Transpile(){
             vector<string> args = Split(tline, ' ');
             
             if (args[0]==Syntax::Define.Keyword){
-                while (i<this->Lines.size()-1 && RTrim(this->Lines[i]).back()=='\\'){
+                while (i<this->Lines.size()-1 && Trim(this->Lines[i]).back()=='\\'){
                     i++;
                     tline.pop_back();
-                    tline+=RTrim(this->Lines[i]);
+                    tline+=Trim(this->Lines[i]);
                 }
 
                 if (preend)
