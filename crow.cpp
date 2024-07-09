@@ -34,13 +34,14 @@ int main(int argc, char* argv[]){
     if (argc<2)
         Error("No input file", false);
 
-    string path = string(argv[1]);
-    Transpiler.CurrentFile = path.substr(path.find_last_of("/\\")+1);
+    filesystem::path path(argv[1]);
+    string abspath = filesystem::absolute(path).string();
+    Transpiler.CurrentFile = path.filename().string();
 
     auto start = high_resolution_clock::now();
     
-    tie(Transpiler.Code, Transpiler.Lines) = ReadFile(path);
-    WriteFile(path, Transpiler.Transpile());
+    tie(Transpiler.Code, Transpiler.Lines) = ReadFile(abspath);
+    WriteFile(abspath, Transpiler.Transpile());
  
     cout << "Transpiled to "+Transpiler.CurrentFile << endl 
         << "Process exited after " << (float)(duration_cast<microseconds>(high_resolution_clock::now()-start).count())/1e6 << " seconds";
