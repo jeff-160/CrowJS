@@ -88,6 +88,7 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
             for (size_t i=0;i<=1;i++){
                 if (ISENTER(Syntax::MComment[i])){
                     Transpiler.InComment = !i;
+                    pos++;
                     goto cend;
                 }
             }
