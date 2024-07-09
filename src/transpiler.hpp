@@ -14,7 +14,7 @@ namespace Syntax {
 struct JSTranspiler{
     string Code, CurrentFile, CurrentCode;
     vector<string> Lines;
-    int CurrentLine = 0;
+    size_t CurrentLine = 0;
 
     bool InComment = false, InRegex = false;
     vector<string> StringStack;

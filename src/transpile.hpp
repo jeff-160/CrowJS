@@ -41,7 +41,7 @@ static inline bool CheckBefore(const string& s, const string& f, size_t p, size_
 }
 
 static constexpr bool IsEscape(const string& s, int p){
-    int t = 0;
+    size_t t = 0;
 
     while (p>=0){
         if (s[p]=='\\')

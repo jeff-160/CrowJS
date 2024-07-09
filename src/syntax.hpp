@@ -6,7 +6,7 @@ namespace Syntax{
     const regex Name("[_a-z0-9]+", regex_constants::icase);
     const regex FuncName("([_a-z0-9]+)\\((.*)\\)", regex_constants::icase);
 
-    static int NameType(const string& name){
+    static char NameType(const string& name){
         if (!regex_match(string(1, name[0]), regex("[_a-z]", regex_constants::icase)))
             return 0;
 
@@ -25,7 +25,7 @@ namespace Syntax{
             if (args.size()<2) 
                 Error("No macro name given in "+args[0]+" directive");
 
-            int type = NameType(args[1]);
+            char type = NameType(args[1]);
             if (!type)
                 Error("Macro name must be identifier");
 
@@ -37,7 +37,6 @@ namespace Syntax{
                 regex_search(name, m, FuncName);
 
                 params = GetFuncArgs(m[2]);
-                    
                 name = string(m[1])+"\\(([^)]*)\\)";
             }
             

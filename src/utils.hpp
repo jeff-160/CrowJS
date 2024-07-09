@@ -12,7 +12,7 @@ void Error(const string& message, bool debug=true){
     exit(0);
 }
 
-inline string Join(const vector<string>& v, string delim){
+inline string Join(const vector<string>& v, const string& delim){
     return accumulate(v.begin(), v.end(), string(), [delim](string &r, const string &s) { return r.empty() ? s : r+delim+s; });
 }
 
@@ -39,7 +39,7 @@ vector<string> Split(const string& s, char d){
 }
 
 #define ADD string tb = Trim(b); if (!tb.empty()) { v.push_back(tb); t--; }
-vector<string> GetArgs(const string& s, size_t t){
+vector<string> GetArgs(const string& s, int t){
     vector<string> v;
     string b;
     bool br = false;
