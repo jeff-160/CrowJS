@@ -2,7 +2,7 @@
 #define REGQUOTES regex("["+Syntax::Quotes+"]")
 #define ADDARG(OUT) string tb = Trim(t); \
                 tb.size() ? (!decl || Syntax::NameType(tb)==1 || tb==Syntax::VArg ? v.push_back(tb) : Error("Macro parameter must be identifier")) : \
-                OUT ? (void)0 : Error("Macro function parameter cannot be empty"); \
+                    OUT ? (void)0 : Error("Macro function parameter cannot be empty"); \
                 t = ""
 
 namespace Syntax{
