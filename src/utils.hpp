@@ -17,7 +17,8 @@ inline string Join(const vector<string>& v, const string& delim){
 }
 
 inline string Trim(string s){
-    s.erase(s.begin(), find_if(s.begin(), s.end(), [](int c) {return !isspace(c);}));
+    s.erase(find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !isspace(ch); }).base(), s.end());
+    s.erase(s.begin(), find_if(s.begin(), s.end(), [](unsigned char ch) { return !isspace(ch); }));
     return s;
 }
 
