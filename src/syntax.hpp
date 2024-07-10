@@ -1,6 +1,8 @@
 #pragma once
 #define REGQUOTES regex("["+Syntax::Quotes+"]")
-#define ADDARG string tb = Trim(t); tb.size() ? v.push_back(tb) : Error("Macro function parameter cannot be empty"); t = ""
+#define ADDARG(out) string tb = Trim(t); \
+                tb.size() ? (!decl || Syntax::NameType(tb)==1 || tb==Syntax::VArg ? v.push_back(tb) : Error("Macro parameter must be identifier")) : \
+                out ? (void)0 : Error("Macro function parameter cannot be empty"); t = ""
 
 namespace Syntax{
     const regex Name("[_a-z0-9]+", regex_constants::icase);
@@ -17,6 +19,8 @@ namespace Syntax{
     const string Comment = "//";
     const string MComment[2] = {"/*", "*/"};
     const string Interpolate[2] = {"${", "}"};
+    const string VArg = "...";
+    const string VMacro = "__VA_ARGS__";
 
     struct {
         const string Keyword = "#define";
@@ -36,7 +40,7 @@ namespace Syntax{
                 smatch m;
                 regex_search(name, m, FuncName);
 
-                params = GetFuncArgs(m[2]);
+                params = GetFuncArgs(m[2], true);
                 name = string(m[1])+"\\(([^)]*)\\)";
             }
             
@@ -45,7 +49,7 @@ namespace Syntax{
     } Define;
 }
 
-vector<string> GetFuncArgs(const string& s){
+vector<string> GetFuncArgs(const string& s, bool decl){
     vector<string> v;
     string t = "";
     char lastquote = NULL;
@@ -58,13 +62,21 @@ vector<string> GetFuncArgs(const string& s){
         }
 
         if (s[i]==',' && !instring){
-            ADDARG;
+            ADDARG(0);
             continue;
         }
         
         t+=s[i];
     }
-    ADDARG;
+    ADDARG(1);
+
+    bool e = false;
+    for (string a : v){
+        if (e)
+            Error(a==Syntax::VArg ? "Macro function can only have a single variadic argument list" : "Variadic argument list must be last parameter in macro function");
+        if (a==Syntax::VArg)
+            e = true;
+    }
 
     return v;
 }

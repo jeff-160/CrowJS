@@ -1,8 +1,6 @@
 ## Syntax
 
-The syntax for macros in CrowJS is essentially the same as in C++, except for two changes.
-- Macros must be declared at the top of the file
-- There are no variadic macro functions
+The syntax for macros in CrowJS is essentially the same as in C++, except for the requirement that macros must be declared at the top of the file
 
 ---
 
@@ -61,6 +59,25 @@ Output:
 console.log(2**3)
 ```
 
+<br>
+
+Variadic macro functions can also be declared, and the arguments can be accessed using the `__VA_ARGS__` macro.
+
+Input
+```javascript
+#define f1(...) console.log(__VA_ARGS__)
+#define f2(a, ...) console.log(__VA_ARGS__)
+
+f1(1, "hello world", true)
+f2(1, "hello world", true)
+```
+
+Output
+```javascript
+console.log([1, "hello world", true])
+console.log(["hello world", true])
+```
+
 ---
 
 ## Predefined macros
@@ -68,4 +85,4 @@ console.log(2**3)
 `__TIME__`: Current time (hh:mm:ss)  
 `__FILE__`: Filename of the transpiled source file  
 `__LINE__`: Current line in the transpiled source file  
-`__FUNCTION__`: Name of the function the macro is in, otherwise returns `null` 
+`__FUNCTION__`: Name of the function the macro is in, otherwise returns `null`

@@ -54,4 +54,4 @@ vector<string> GetArgs(const string& s, int t){
     return v;
 }
 
-vector<string> GetFuncArgs(const string& s);
+vector<string> GetFuncArgs(const string& s, bool decl);

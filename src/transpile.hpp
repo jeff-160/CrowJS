@@ -65,13 +65,23 @@ static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>&
 static string ReplaceFunction(const Syntax::Macro& macro, const string& params){
     unordered_map<string, Syntax::Macro> copydef = Transpiler.Definitions;
 
-    vector<string> args = GetFuncArgs(params);
-    size_t nargs = macro.Params.size();
-    if (args.size()!=nargs)
-        Error("Macro function expected "+to_string(nargs)+" arguments, got "+to_string(args.size()));
+    vector<string> args = GetFuncArgs(params, false);
+    bool isvariadic = !macro.Params.empty() && macro.Params.back()==Syntax::VArg;
+    int nargs = macro.Params.size()-isvariadic;
+
+    if (isvariadic ? nargs>args.size() : args.size()!=nargs)
+        Error("Macro function expected at least "+to_string(nargs)+" arguments, got "+to_string(args.size()));
     
     for (size_t i=0;i<nargs;i++)
         copydef[macro.Params[i]] = args[i];
+
+    if (isvariadic){
+        vector<string> vargs;
+        for (size_t i=nargs;i<args.size();i++)
+            vargs.push_back(args[i]);
+
+        copydef[Syntax::VMacro] = '['+Join(vargs, ", ")+']';
+    }
 
     return ReplaceMacro(macro.Value, copydef);
 }
