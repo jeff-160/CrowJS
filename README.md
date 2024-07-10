@@ -2,6 +2,7 @@
 
 CrowJS is a JavaScript superset that has C++ style macros, seeking to provide convenience when programming by reducing repetitive code.
 
+0x3af72 wuz here
 
 ## Getting started
 
