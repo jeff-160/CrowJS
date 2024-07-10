@@ -1,6 +1,8 @@
 ## Syntax
 
-The syntax for macros in CrowJS is generally the same as in C++, except for the requirement that macros must be placed at the top of the file.
+The syntax for macros in CrowJS is essentially the same as in C++, except for two changes.
+- Macros must be declared at the top of the file
+- There are no variadic macro functions
 
 ---
 
@@ -22,6 +24,26 @@ console.log(3.141592654)
 console.log(2*3.141592654)
 ```
 
+</br>
+
+CrowJS also works with string interpolation.
+
+Input
+```javascript
+#define x 1
+
+`${
+    x+"x"+`${x}`
+} ${x}`
+```
+
+Output
+```javascript
+`${
+    1+"x"+`${1}`
+} ${1}`
+```
+
 ---
 
 ## Function-like macros
@@ -31,7 +53,7 @@ Input:
 ```javascript
 #define pow(a, b) a**b
 
-pow(2, 3)
+console.log(pow(2, 3))
 ```
 
 Output:
