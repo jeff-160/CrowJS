@@ -2,7 +2,8 @@
 #define REGQUOTES regex("["+Syntax::Quotes+"]")
 #define ADDARG(OUT) string tb = Trim(t); \
                 tb.size() ? (!decl || Syntax::NameType(tb)==1 || tb==Syntax::VArg ? v.push_back(tb) : Error("Macro parameter must be identifier")) : \
-                OUT ? (void)0 : Error("Macro function parameter cannot be empty"); t = ""
+                OUT ? (void)0 : Error("Macro function parameter cannot be empty"); \
+                t = ""
 
 namespace Syntax{
     const regex Name("[_a-z0-9]+", regex_constants::icase);
