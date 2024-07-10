@@ -31,7 +31,7 @@ goto :main
     call :print "Adding path to system environment variables" Yellow
     echo %PATH% | find /i "%cd%" > nul
     if errorlevel 1 (
-        setx /m PATH "%PATH%;%cd%"
+        setx /m PATH "%PATH%;%cd%" > nul
         call :print "%cd% added to system environment variables" Green
     ) else (
         call :print "%cd% already exists in system environment variables" Yellow
