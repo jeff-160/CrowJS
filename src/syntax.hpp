@@ -1,8 +1,7 @@
 #pragma once
 #define REGQUOTES regex("["+Syntax::Quotes+"]")
-#define ADDARG(OUT) string tb = Trim(t); \
-                tb.size() ? (!decl || Syntax::NameType(tb)==1 || tb==Syntax::VArg ? v.push_back(tb) : Error("Macro parameter must be identifier")) : \
-                    OUT ? (void)0 : Error("Macro function parameter cannot be empty"); \
+#define ADDARG string tb = Trim(t); \
+                tb.size() ? (!decl || Syntax::NameType(tb)==1 || tb==Syntax::VArg ? v.push_back(tb) : Error("Macro parameter must be identifier")) : Error("Macro function parameter cannot be empty"); \
                 t = ""
 
 namespace Syntax{
@@ -63,13 +62,13 @@ vector<string> GetFuncArgs(const string& s, bool decl){
         }
 
         if (s[i]==',' && !instring){
-            ADDARG(0);
+            ADDARG;
             continue;
         }
         
         t+=s[i];
     }
-    ADDARG(1);
+    ADDARG;
 
     bool e = false;
     for (string a : v){

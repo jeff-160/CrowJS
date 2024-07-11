@@ -62,8 +62,9 @@ static inline bool IsIdentifier(const string& s, int a, int b){
 
 static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>& def);
 
-static string ReplaceFunction(const Syntax::Macro& macro, const string& params){
+static string ReplaceFunction(const string& name, const Syntax::Macro& macro, const string& params){
     unordered_map<string, Syntax::Macro> copydef = Transpiler.Definitions;
+    Transpiler.ReplacedMacros[name] = true;
 
     vector<string> args = GetFuncArgs(params, false);
     bool isvariadic = !macro.Params.empty() && macro.Params.back()==Syntax::VArg;
@@ -139,8 +140,8 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
                 if (exclude)
                     Error("Recursive macro is not allowed");
                 c = true;
-                
-                string value = repr.IsFunction ? ReplaceFunction(repr, m[1]) : repr.Value;
+
+                string value = repr.IsFunction ? ReplaceFunction(macro, repr, m[1]) : repr.Value;
                 line.replace(nextmacro, string(m[0]).size(), value);
                 pos = nextmacro+value.size()-1;
             }
@@ -158,7 +159,6 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
 static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>& def){
     bool b = true;
-    unordered_map<string, bool> m;
     pair<vector<string>, bool> ss, is, ls; 
         ss = is = ls = {PAIR};
 
@@ -170,10 +170,10 @@ static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>&
             tie(PAIR) = ls;
             
             bool c;
-            tie(c, s) = ReplaceInstances(s, name, repr, m[name]);
+            tie(c, s) = ReplaceInstances(s, name, repr, Transpiler.ReplacedMacros[name]);
 
             if (c)
-                m[name] = b = true;
+                Transpiler.ReplacedMacros[name] = b = true;
 
             is = {PAIR};
         }
@@ -216,6 +216,8 @@ string JSTranspiler::Transpile(){
         else{
             if (!tline.empty() && tline.rfind(Syntax::Comment) && tline.rfind(Syntax::MComment[0]))
                 preend = true;
+
+            Transpiler.ReplacedMacros.clear();
             result.push_back(ReplaceMacro(this->CurrentCode, Transpiler.Definitions));
         }
 

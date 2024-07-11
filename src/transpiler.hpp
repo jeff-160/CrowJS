@@ -26,6 +26,7 @@ struct JSTranspiler{
         {"__LINE__", Syntax::Macro("new Error().stack.match(/:(\\d+):/)[1]")},
         {"__FUNCTION__", Syntax::Macro("(typeof arguments=='undefined' ? null : arguments?.callee?.name)")}
     };
+    unordered_map<string, bool> ReplacedMacros;
 
     bool InString();
     bool InInterpolate();
