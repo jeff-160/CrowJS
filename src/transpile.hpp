@@ -62,9 +62,8 @@ static inline bool IsIdentifier(const string& s, int a, int b){
 
 static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>& def);
 
-static string ReplaceFunction(const string& name, const Syntax::Macro& macro, const string& params){
+static string ReplaceFunction(const Syntax::Macro& macro, const string& params){
     unordered_map<string, Syntax::Macro> copydef = Transpiler.Definitions;
-    Transpiler.ReplacedMacros[name] = true;
 
     vector<string> args = GetFuncArgs(params, false);
     bool isvariadic = !macro.Params.empty() && macro.Params.back()==Syntax::VArg;
@@ -139,9 +138,9 @@ static pair<bool, string> ReplaceInstances(string line, const string& macro, con
 
                 if (exclude)
                     Error("Recursive macro is not allowed");
-                c = true;
+                Transpiler.ReplacedMacros[macro] = c = true;
 
-                string value = repr.IsFunction ? ReplaceFunction(macro, repr, m[1]) : repr.Value;
+                string value = repr.IsFunction ? ReplaceFunction(repr, m[1]) : repr.Value;
                 line.replace(nextmacro, string(m[0]).size(), value);
                 pos = nextmacro+value.size()-1;
             }
@@ -172,9 +171,7 @@ static string ReplaceMacro(string s, const unordered_map<string, Syntax::Macro>&
             bool c;
             tie(c, s) = ReplaceInstances(s, name, repr, Transpiler.ReplacedMacros[name]);
 
-            if (c)
-                Transpiler.ReplacedMacros[name] = b = true;
-
+            b = b || c;
             is = {PAIR};
         }
         tie(PAIR) = ss;

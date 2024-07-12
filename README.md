@@ -22,7 +22,7 @@ Transpile to JavaScript
 ```batch
 > crow myfile.js
 Transpiled to test.js
-Process exited after 0.063584 seconds
+Process exited after 0.055058 seconds
 ```
 
 
