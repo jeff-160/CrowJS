@@ -30,4 +30,3 @@ Process exited after 0.055058 seconds
 
 - [Documentation](docs.md)
 - [C++ macros](https://www.geeksforgeeks.org/cpp-macros/) 
-- https://www.youtube.com/watch?v=uOiccQx20d8
